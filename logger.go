@@ -23,10 +23,14 @@ var (
 	FATAL   = Level{"FATAL", ColorRed, true, true}
 )
 
-func Log(level Level, msg string) {
+func Log(level Level, params ...interface{}) {
 	now := time.Now().Format("15:04:05")
+	formatParams := []interface{}{level.Color, ColorBold, level.Name, now, ColorReset}
+	formatParams = append(formatParams, params...)
+
 	formattedMsg := fmt.Sprintf(
-		"%s%s[%s @ %s]%s %s", level.Color, ColorBold, level.Name, now, ColorReset, msg,
+		"%s%s[%s @ %s]%s %s",
+		formatParams...,
 	)
 	if level.Error {
 		stderr.Println(formattedMsg)
@@ -43,28 +47,28 @@ func Logf(level Level, format string, v ...interface{}) {
 	Log(level, fmt.Sprintf(format, v...))
 }
 
-func Debug(msg string) {
-	Log(DEBUG, msg)
+func Debug(params ...interface{}) {
+	Log(DEBUG, params...)
 }
 
-func Success(msg string) {
-	Log(SUCCESS, msg)
+func Success(params ...interface{}) {
+	Log(SUCCESS, params...)
 }
 
-func Info(msg string) {
-	Log(INFO, msg)
+func Info(params ...interface{}) {
+	Log(INFO, params...)
 }
 
-func Warn(msg string) {
-	Log(WARN, msg)
+func Warn(params ...interface{}) {
+	Log(WARN, params...)
 }
 
-func Error(msg string) {
-	Log(ERROR, msg)
+func Error(params ...interface{}) {
+	Log(ERROR, params...)
 }
 
-func Fatal(msg string) {
-	Log(FATAL, msg)
+func Fatal(params ...interface{}) {
+	Log(FATAL, params...)
 }
 
 func Debugf(format string, v ...interface{}) {
