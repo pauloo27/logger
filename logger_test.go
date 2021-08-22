@@ -10,6 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testLogLevel struct {
+	Level    logger.Level
+	LogFunc  func(...interface{})
+	LogfFunc func(string, ...interface{})
+}
+
 func TestLogger(t *testing.T) {
 	// change the stdout to something we can manage
 	r, w, err := os.Pipe()
@@ -31,19 +37,38 @@ func TestLogger(t *testing.T) {
 		assert.Equal(t, expected, line)
 	}
 
-	defaultLevelsFunc := []func(...interface{}){logger.Debug, logger.Success, logger.Info, logger.Warn}
+	defaultLevelsFunc := []testLogLevel{
+		{Level: logger.DEBUG, LogFunc: logger.Debug, LogfFunc: logger.Debugf},
+		{Level: logger.SUCCESS, LogFunc: logger.Success, LogfFunc: logger.Successf},
+		{Level: logger.INFO, LogFunc: logger.Info, LogfFunc: logger.Infof},
+		{Level: logger.WARN, LogFunc: logger.Warn, LogfFunc: logger.Warnf},
+	}
 
-	t.Run("simple 'hello' log in all non-error levels", func(t *testing.T) {
+	t.Run("log 'hello' in all non-error levels", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
-			level("hello")
+			level.LogFunc("hello")
 			assertLog("hello")
 		}
 	})
 
-	t.Run("simple '10' log in all non-error levels", func(t *testing.T) {
+	t.Run("log '10' in all non-error levels", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
-			level(10)
+			level.LogFunc(10)
 			assertLog("10")
+		}
+	})
+
+	t.Run("logf 'hi steve'", func(t *testing.T) {
+		for _, level := range defaultLevelsFunc {
+			level.LogfFunc("hi %s", "steve")
+			assertLog("hi steve")
+		}
+	})
+
+	t.Run("logf 'hi im steve and my favorite number is -127'", func(t *testing.T) {
+		for _, level := range defaultLevelsFunc {
+			level.LogfFunc("hi im %s and my favorite number is %d", "steve", -127)
+			assertLog("hi im steve and my favorite number is -127")
 		}
 	})
 
