@@ -29,11 +29,14 @@ func TestLogger(t *testing.T) {
 	// create a reader to read the logged lines
 	reader := bufio.NewReader(r)
 
-	// a function that checks if the output is the "exepect" one
+	// a function that checks if the output is the "exepected" one
 	assertLog := func(t *testing.T, expected string) {
 		line, err := reader.ReadString('\n')
-		line = strings.TrimSuffix(strings.Join(strings.Split(line, " ")[3:], " "), "\n")
 		assert.Nil(t, err)
+		// trim the [LEVEL @ hh:mm:ss] prefix
+		// (by splitting by spaces, I guess thats not really good tho)
+		// and the \n suffix
+		line = strings.TrimSuffix(strings.Join(strings.Split(line, " ")[3:], " "), "\n")
 		assert.Equal(t, expected, line)
 	}
 
