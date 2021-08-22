@@ -7,6 +7,7 @@ import (
 )
 
 func TestLogger(t *testing.T) {
+	logger.Debug(10)
 	logger.Debug("Hello world")
 	logger.Success("Hello world")
 	logger.Info("Hello world")

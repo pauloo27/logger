@@ -29,7 +29,7 @@ func Log(level Level, params ...interface{}) {
 	formatParams = append(formatParams, params...)
 
 	formattedMsg := fmt.Sprintf(
-		"%s%s[%s @ %s]%s %s",
+		"%s%s[%s @ %s]%s %v",
 		formatParams...,
 	)
 	if level.Error {
