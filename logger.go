@@ -2,15 +2,14 @@ package logger
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"runtime/debug"
 	"time"
 )
 
 var (
-	stdout = log.New(os.Stdout, "", 0)
-	stderr = log.New(os.Stderr, "", 0)
+	Stdout = os.Stdout
+	Stderr = os.Stderr
 )
 
 // levels
@@ -33,10 +32,10 @@ func Log(level Level, params ...interface{}) {
 		formatParams...,
 	)
 	if level.Error {
-		stderr.Println(formattedMsg)
+		fmt.Fprintln(Stderr, formattedMsg)
 		debug.PrintStack()
 	} else {
-		stdout.Println(formattedMsg)
+		fmt.Fprintln(Stdout, formattedMsg)
 	}
 	if level.Fatal {
 		os.Exit(-1)
