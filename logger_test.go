@@ -29,7 +29,7 @@ func TestLogger(t *testing.T) {
 	// create a reader to read the logged lines
 	reader := bufio.NewReader(r)
 
-	// a function that checks if the output is the "exepected" one
+	// a function that checks if the output is the "expected" one
 	assertLog := func(t *testing.T, expected string) {
 		line, err := reader.ReadString('\n')
 		assert.Nil(t, err)
@@ -47,46 +47,45 @@ func TestLogger(t *testing.T) {
 		{Level: logger.WARN, LogFunc: logger.Warn, LogfFunc: logger.Warnf},
 	}
 
-	t.Run("log 'hello' in all non-error levels", func(t *testing.T) {
+	testLogDefaultLevels := func(expected string, params ...interface{}) {
 		for _, level := range defaultLevelsFunc {
-			level.LogFunc("hello")
-			assertLog(t, "hello")
+			level.LogFunc(params...)
+			assertLog(t, expected)
 		}
+	}
+
+	testLogfDefaultLevels := func(expected string, format string, params ...interface{}) {
+		for _, level := range defaultLevelsFunc {
+			level.LogfFunc(format, params...)
+			assertLog(t, expected)
+		}
+	}
+
+	t.Run("log 'hello' in all non-error levels", func(t *testing.T) {
+		testLogDefaultLevels("hello", "hello")
 	})
 
 	t.Run("log '10' in all non-error levels", func(t *testing.T) {
-		for _, level := range defaultLevelsFunc {
-			level.LogFunc(10)
-			assertLog(t, "10")
-		}
+		testLogDefaultLevels("10", 10)
 	})
 
 	t.Run("logf 'hi steve'", func(t *testing.T) {
-		for _, level := range defaultLevelsFunc {
-			level.LogfFunc("hi %s", "steve")
-			assertLog(t, "hi steve")
-		}
+		testLogfDefaultLevels("hi steve", "hi %s", "steve")
 	})
 
 	t.Run("logf 'hi im steve and my favorite number is -127'", func(t *testing.T) {
-		for _, level := range defaultLevelsFunc {
-			level.LogfFunc("hi im %s and my favorite number is %d", "steve", -127)
-			assertLog(t, "hi im steve and my favorite number is -127")
-		}
+		testLogfDefaultLevels(
+			"hi im steve and my favorite number is -127",
+			"hi im %s and my favorite number is %d", "steve", -127,
+		)
 	})
 
 	t.Run("log 'nice 10'", func(t *testing.T) {
-		for _, level := range defaultLevelsFunc {
-			level.LogFunc("nice", 10)
-			assertLog(t, "nice 10")
-		}
+		testLogDefaultLevels("nice 10", "nice", 10)
 	})
 
 	t.Run("log 'nice true 10'", func(t *testing.T) {
-		for _, level := range defaultLevelsFunc {
-			level.LogFunc("nice", true, 10)
-			assertLog(t, "nice true 10")
-		}
+		testLogDefaultLevels("nice true 10", "nice", true, 10)
 	})
 
 	// TODO: custom level
