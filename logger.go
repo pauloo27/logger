@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"strings"
 	"time"
 )
 
@@ -23,19 +24,22 @@ var (
 )
 
 func Log(level Level, params ...interface{}) {
-	now := time.Now().Format("15:04:05")
-	formatParams := []interface{}{level.Color, ColorBold, level.Name, now, ColorReset}
-	formatParams = append(formatParams, params...)
+	var message strings.Builder
 
-	formattedMsg := fmt.Sprintf(
-		"%s%s[%s @ %s]%s %v",
-		formatParams...,
-	)
+	now := time.Now().Format("15:04:05")
+
+	// write the prefix
+	message.WriteString(fmt.Sprintf("%s%s[%s @ %s]%s ",
+		level.Color, ColorBold, level.Name, now, ColorReset,
+	))
+
+	message.WriteString(fmt.Sprintln(params...))
+
 	if level.Error {
-		fmt.Fprintln(Stderr, formattedMsg)
+		fmt.Fprint(Stderr, message.String())
 		debug.PrintStack()
 	} else {
-		fmt.Fprintln(Stdout, formattedMsg)
+		fmt.Fprint(Stdout, message.String())
 	}
 	if level.Fatal {
 		os.Exit(-1)
