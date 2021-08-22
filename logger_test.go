@@ -30,7 +30,7 @@ func TestLogger(t *testing.T) {
 	reader := bufio.NewReader(r)
 
 	// a function that checks if the output is the "exepect" one
-	assertLog := func(expected string) {
+	assertLog := func(t *testing.T, expected string) {
 		line, err := reader.ReadString('\n')
 		line = strings.TrimSuffix(strings.Join(strings.Split(line, " ")[3:], " "), "\n")
 		assert.Nil(t, err)
@@ -47,33 +47,45 @@ func TestLogger(t *testing.T) {
 	t.Run("log 'hello' in all non-error levels", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
 			level.LogFunc("hello")
-			assertLog("hello")
+			assertLog(t, "hello")
 		}
 	})
 
 	t.Run("log '10' in all non-error levels", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
 			level.LogFunc(10)
-			assertLog("10")
+			assertLog(t, "10")
 		}
 	})
 
 	t.Run("logf 'hi steve'", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
 			level.LogfFunc("hi %s", "steve")
-			assertLog("hi steve")
+			assertLog(t, "hi steve")
 		}
 	})
 
 	t.Run("logf 'hi im steve and my favorite number is -127'", func(t *testing.T) {
 		for _, level := range defaultLevelsFunc {
 			level.LogfFunc("hi im %s and my favorite number is %d", "steve", -127)
-			assertLog("hi im steve and my favorite number is -127")
+			assertLog(t, "hi im steve and my favorite number is -127")
 		}
 	})
 
-	// TODO: logf
-	// TODO: multiple parameters
+	t.Run("log 'nice 10'", func(t *testing.T) {
+		for _, level := range defaultLevelsFunc {
+			level.LogFunc("nice", 10)
+			assertLog(t, "nice 10")
+		}
+	})
+
+	t.Run("log 'nice true 10'", func(t *testing.T) {
+		for _, level := range defaultLevelsFunc {
+			level.LogFunc("nice", true, 10)
+			assertLog(t, "nice true 10")
+		}
+	})
+
 	// TODO: custom level
 	// TODO: error/fatal
 }
