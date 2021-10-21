@@ -26,6 +26,10 @@ var (
 func Log(level Level, params ...interface{}) {
 	var message strings.Builder
 
+	for _, listener := range listeners {
+		listener(level, params)
+	}
+
 	now := time.Now().Format("15:04:05")
 
 	// write the prefix

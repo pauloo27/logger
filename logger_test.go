@@ -16,7 +16,7 @@ type testLogLevel struct {
 	LogfFunc func(string, ...interface{})
 }
 
-func TestLogger(t *testing.T) {
+func logToReader(t *testing.T) *bufio.Reader {
 	// change the stdout to something we can manage
 	r, w, err := os.Pipe()
 
@@ -27,18 +27,21 @@ func TestLogger(t *testing.T) {
 	logger.Stdout = w
 
 	// create a reader to read the logged lines
-	reader := bufio.NewReader(r)
+	return bufio.NewReader(r)
+}
 
-	// a function that checks if the output is the "expected" one
-	assertLog := func(t *testing.T, expected string) {
-		line, err := reader.ReadString('\n')
-		assert.Nil(t, err)
-		// trim the [LEVEL @ hh:mm:ss] prefix
-		// (by splitting by spaces, I guess thats not really good tho)
-		// and the \n suffix
-		line = strings.TrimSuffix(strings.Join(strings.Split(line, " ")[3:], " "), "\n")
-		assert.Equal(t, expected, line)
-	}
+func assertLog(t *testing.T, reader *bufio.Reader, expected string) {
+	line, err := reader.ReadString('\n')
+	assert.Nil(t, err)
+	// trim the [LEVEL @ hh:mm:ss] prefix
+	// (by splitting by spaces, I guess thats not really good tho)
+	// and the \n suffix
+	line = strings.TrimSuffix(strings.Join(strings.Split(line, " ")[3:], " "), "\n")
+	assert.Equal(t, expected, line)
+}
+
+func TestLogger(t *testing.T) {
+	reader := logToReader(t)
 
 	defaultLevelsFunc := []testLogLevel{
 		{Level: logger.DEBUG, LogFunc: logger.Debug, LogfFunc: logger.Debugf},
@@ -50,14 +53,14 @@ func TestLogger(t *testing.T) {
 	testLogDefaultLevels := func(expected string, params ...interface{}) {
 		for _, level := range defaultLevelsFunc {
 			level.LogFunc(params...)
-			assertLog(t, expected)
+			assertLog(t, reader, expected)
 		}
 	}
 
 	testLogfDefaultLevels := func(expected string, format string, params ...interface{}) {
 		for _, level := range defaultLevelsFunc {
 			level.LogfFunc(format, params...)
-			assertLog(t, expected)
+			assertLog(t, reader, expected)
 		}
 	}
 
@@ -90,4 +93,18 @@ func TestLogger(t *testing.T) {
 
 	// TODO: custom level
 	// TODO: error/fatal
+}
+
+func TestListener(t *testing.T) {
+	reader := logToReader(t)
+	ch := make(chan logger.Level, 1)
+
+	logger.AddLogListener(func(level logger.Level, params ...interface{}) {
+		ch <- level
+	})
+
+	logger.Info("Ednaldo Pereira")
+	assertLog(t, reader, "Ednaldo Pereira")
+	level := <-ch
+	assert.Equal(t, logger.INFO, level)
 }
