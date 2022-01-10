@@ -41,7 +41,8 @@ func Log(level Level, params ...interface{}) {
 
 	if level.Error {
 		fmt.Fprint(Stderr, message.String())
-		debug.PrintStack()
+		stack := debug.Stack()
+		fmt.Fprint(Stderr, string(stack))
 	} else {
 		fmt.Fprint(Stdout, message.String())
 	}
