@@ -1,4 +1,4 @@
-module github.com/Pauloo27/logger
+module github.com/pauloo27/logger
 
 go 1.16
 

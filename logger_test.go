@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Pauloo27/logger"
+	"github.com/pauloo27/logger"
 	"github.com/stretchr/testify/assert"
 )
 
