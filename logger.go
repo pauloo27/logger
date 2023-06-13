@@ -13,16 +13,6 @@ var (
 	Stderr = os.Stderr
 )
 
-// levels
-var (
-	DEBUG   = Level{"DEBUG", ColorBlue, false, false}
-	SUCCESS = Level{"SUCCESS", ColorGreen, false, false}
-	INFO    = Level{"INFO", ColorWhite, false, false}
-	WARN    = Level{"WARN", ColorYellow, false, false}
-	ERROR   = Level{"ERROR", ColorRed, true, false}
-	FATAL   = Level{"FATAL", ColorRed, true, true}
-)
-
 func Log(level Level, params ...interface{}) {
 	var message strings.Builder
 
